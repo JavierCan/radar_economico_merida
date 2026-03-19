@@ -1,0 +1,46 @@
+project:
+  name: radar_economico_merida
+  city: Merida
+  state: Yucatan
+  country: Mexico
+  stage: phase_1
+
+paths:
+  raw: data/raw
+  processed: data/processed
+  snapshots: data/snapshots
+  metadata: data/metadata
+  external: data/external
+  logs: logs
+
+files:
+  latest_dataset: data/processed/radar_merida_latest.parquet
+  manifest: data/metadata/manifest.csv
+  latest_hash: data/metadata/latest_hash.txt
+  merida_geojson: data/external/merida_limites.geojson
+
+sources:
+  primary: denue_api
+  secondary: merida_geo_layer
+
+denue:
+  enabled: true
+  api_token_env: INEGI_API_TOKEN
+  base_url: ""
+  timeout_seconds: 60
+  query:
+    palabra: restaurante
+    latitud: 20.96737
+    longitud: -89.59258
+    radio: 10000
+
+merida:
+  enabled: true
+  local_geojson_path: data/external/merida_limites.geojson
+  remote_geojson_url: ""
+
+etl:
+  mode: manual_on_demand
+  compare_hash: false
+  save_snapshots: false
+  enabled: true
