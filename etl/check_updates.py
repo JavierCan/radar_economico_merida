@@ -3,7 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 import hashlib
 
-from etl.common import load_settings, latest_file, ensure_dir
+from etl.common import ensure_dir, get_logger, latest_file, load_settings
+
+logger = get_logger("etl.check_updates")
 
 
 def sha256_file(path: str | Path) -> str:
@@ -51,7 +53,7 @@ def read_previous_hash() -> str | None:
 def save_current_hash(hash_value: str) -> Path:
     hash_file = get_hash_file_path()
     hash_file.write_text(hash_value, encoding="utf-8")
-    print(f"Hash guardado en: {hash_file}")
+    logger.info("Hash guardado en %s", hash_file)
     return hash_file
 
 
@@ -61,14 +63,14 @@ def has_raw_changed() -> tuple[bool, str, Path]:
     previous_hash = read_previous_hash()
 
     if previous_hash is None:
-        print("No existe hash previo. Se considera que hubo cambio.")
+        logger.info("No existe hash previo. Se considera que hubo cambio.")
         return True, current_hash, latest_raw
 
     changed = current_hash != previous_hash
 
     if changed:
-        print("Se detectó cambio en el raw.")
+        logger.info("Se detectó cambio en el raw.")
     else:
-        print("No hubo cambios en el raw.")
+        logger.info("No hubo cambios en el raw.")
 
     return changed, current_hash, latest_raw

@@ -3,16 +3,18 @@ from __future__ import annotations
 from pathlib import Path
 from urllib.parse import quote
 import json
-import requests
-import pandas as pd
-from dotenv import load_dotenv
 
-from etl.common import load_settings, ensure_dir, now_tag, get_env
+from dotenv import load_dotenv
+import pandas as pd
+import requests
+
+from etl.common import ensure_dir, get_env, get_logger, load_settings, now_tag
 
 load_dotenv()
+logger = get_logger("etl.extract_denue")
 
 
-def _normalize_denue_payload(payload) -> pd.DataFrame:
+def _normalize_denue_payload(payload: object) -> pd.DataFrame:
     if isinstance(payload, list):
         return pd.DataFrame(payload)
 
@@ -39,6 +41,16 @@ def build_denue_url(
     return f"{base_url.rstrip('/')}/{palabra_encoded}/{latitud},{longitud}/{radio}/{token}"
 
 
+def fetch_denue_payload(url: str, timeout_seconds: int) -> object:
+    response = requests.get(url, timeout=timeout_seconds)
+    response.raise_for_status()
+
+    try:
+        return response.json()
+    except ValueError as exc:
+        raise ValueError(f"La respuesta de DENUE no fue JSON interpretable: {exc}") from exc
+
+
 def extract_denue(save_raw: bool = True) -> pd.DataFrame:
     settings = load_settings()
     denue_cfg = settings["denue"]
@@ -54,14 +66,10 @@ def extract_denue(save_raw: bool = True) -> pd.DataFrame:
     base_url = get_env(base_url_env_name, "").strip()
 
     if not api_token:
-        raise ValueError(
-            f"No existe el token en la variable de entorno '{token_env_name}'"
-        )
+        raise ValueError(f"No existe el token en la variable de entorno '{token_env_name}'")
 
     if not base_url:
-        raise ValueError(
-            f"No existe la URL base en la variable de entorno '{base_url_env_name}'"
-        )
+        raise ValueError(f"No existe la URL base en la variable de entorno '{base_url_env_name}'")
 
     queries = denue_cfg.get("queries", [])
     if not queries:
@@ -90,16 +98,7 @@ def extract_denue(save_raw: bool = True) -> pd.DataFrame:
             token=api_token,
         )
 
-        response = requests.get(url, timeout=timeout_seconds)
-        response.raise_for_status()
-
-        try:
-            payload = response.json()
-        except Exception as e:
-            raise ValueError(
-                f"La respuesta de DENUE no fue JSON interpretable para '{palabra}': {e}"
-            )
-
+        payload = fetch_denue_payload(url, timeout_seconds)
         payloads_by_query[palabra] = payload
 
         df_query = _normalize_denue_payload(payload)
@@ -107,18 +106,17 @@ def extract_denue(save_raw: bool = True) -> pd.DataFrame:
         if not df_query.empty:
             df_query["search_term"] = palabra
             df_query["source_name"] = "denue_api"
-            df_query["extraction_timestamp"] = pd.Timestamp.now()
+            df_query["extraction_timestamp"] = pd.Timestamp.now(tz="UTC")
             dfs.append(df_query)
 
-        print(f"Consulta completada para: {palabra}")
+        logger.info("Consulta completada para '%s'", palabra)
 
     if not dfs:
-        print("DENUE devolvió respuestas válidas pero sin registros en todas las búsquedas.")
+        logger.warning("DENUE devolvió respuestas válidas pero sin registros en todas las búsquedas.")
         return pd.DataFrame()
 
     df = pd.concat(dfs, ignore_index=True)
 
-    # Deduplicación básica
     preferred_keys = [col for col in ["id", "ID", "Id", "CLEE", "clee"] if col in df.columns]
     if preferred_keys:
         df = df.drop_duplicates(subset=preferred_keys)
@@ -127,7 +125,6 @@ def extract_denue(save_raw: bool = True) -> pd.DataFrame:
 
     if save_raw:
         tag = now_tag()
-
         raw_json_path = Path(raw_dir) / f"denue_raw_{tag}.json"
         raw_parquet_path = Path(raw_dir) / f"denue_raw_{tag}.parquet"
 
@@ -136,8 +133,8 @@ def extract_denue(save_raw: bool = True) -> pd.DataFrame:
 
         df.to_parquet(raw_parquet_path, index=False)
 
-        print(f"JSON raw guardado en: {raw_json_path}")
-        print(f"Parquet raw guardado en: {raw_parquet_path}")
-        print(f"Registros consolidados: {len(df)}")
+        logger.info("JSON raw guardado en %s", raw_json_path)
+        logger.info("Parquet raw guardado en %s", raw_parquet_path)
+        logger.info("Registros consolidados: %s", len(df))
 
     return df
