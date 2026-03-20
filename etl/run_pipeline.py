@@ -114,7 +114,6 @@ def main():
         merida_records = len(gdf_merida)
 
         gdf_processed = transform_data(df_denue, gdf_merida=gdf_merida)
-        validate_processed_dataset(gdf_processed)
         processed_records = len(gdf_processed)
 
         if gdf_processed.empty:
@@ -129,6 +128,8 @@ def main():
             finalize_run(row)
             logger.warning("La transformación devolvió un dataset vacío.")
             return
+
+        validate_processed_dataset(gdf_processed)
 
         snapshot_result = build_snapshot(
             gdf_processed,
