@@ -5,10 +5,10 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from charts import count_table, donut_chart, heatmap_chart, horizontal_bar_chart
-from data import latest_file, load_geojson, load_latest_dataset
-from filters import apply_filters, normalize_text_series
-from map_view import build_map
+from app.charts import count_table, donut_chart, heatmap_chart, horizontal_bar_chart
+from app.data import latest_file, load_geojson, load_latest_dataset
+from app.filters import apply_filters, normalize_text_series
+from app.map_view import build_map
 
 st.set_page_config(page_title="Radar Económico de Mérida", layout="wide")
 
@@ -25,9 +25,14 @@ if not LATEST_PATH.exists():
     st.warning("Aún no existe el dataset procesado. Ejecuta primero el pipeline.")
     st.stop()
 
-df = load_latest_dataset(LATEST_PATH)
+try:
+    df = load_latest_dataset(LATEST_PATH)
+except ValueError as exc:
+    st.error(f"No fue posible cargar el dataset procesado: {exc}")
+    st.stop()
+
 geojson_data = load_geojson(MERIDA_LAYER_PATH)
-latest_summary = latest_file(METADATA_DIR, "phase2_summary_*.csv")
+latest_summary = latest_file(METADATA_DIR, "pipeline_summary_*.csv")
 snapshots_count = len(list(SNAPSHOTS_DIR.glob("radar_merida_*.parquet")))
 
 filtered_df = apply_filters(df)
