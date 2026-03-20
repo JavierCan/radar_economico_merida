@@ -22,6 +22,8 @@ data/metadata/*.txt
 !data/snapshots/.gitkeep
 !data/metadata/.gitkeep
 !data/external/.gitkeep
+!data/external/downloads/.gitkeep
+
 
 # Logs
 logs/*

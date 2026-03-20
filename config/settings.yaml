@@ -26,13 +26,23 @@ sources:
 denue:
   enabled: true
   api_token_env: INEGI_API_TOKEN
-  base_url: ""
+  base_url_env: DENUE_BASE_URL
   timeout_seconds: 60
-  query:
-    palabra: restaurante
+  queries:
+    - restaurante
+    - farmacia
+    - ferreteria
+    - hotel
+    - taller
+    - supermercado
+    - papeleria
+    - veterinaria
+    - abarrotes
+    - panaderia
+  location:
     latitud: 20.96737
     longitud: -89.59258
-    radio: 10000
+    radio: 5000
 
 merida:
   enabled: true
