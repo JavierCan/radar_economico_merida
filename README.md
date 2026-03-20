@@ -56,3 +56,66 @@ transformación geoespacial
 latest + snapshots
    ↓
 dashboard en Streamlit
+```
+
+---
+
+## Configuración principal
+
+La configuración se controla desde `config/settings.yaml`.
+
+Parámetros importantes:
+
+- `etl.enabled`: activa o desactiva el pipeline
+- `etl.compare_hash`: evita reprocesar si el raw más reciente no cambió
+- `etl.save_snapshots`: controla si además de `latest` se guardan snapshots históricos
+- `denue.queries`: términos de búsqueda contra la API
+- `merida.local_geojson_path`: capa geográfica local usada para el join espacial
+
+---
+
+## Ejecución con UV
+
+### 1. Preparar entorno
+
+```bash
+uv sync --frozen --python 3.12
+```
+
+Esto instala dependencias de runtime y desarrollo desde el lockfile, incluyendo `pandas` y `pytest`.
+
+### 2. Ejecutar pruebas
+
+```bash
+uv run pytest
+```
+
+### 3. Ejecutar lint
+
+```bash
+uv run ruff check .
+```
+
+### 4. Ejecutar pipeline
+
+```bash
+uv run python -m etl.run_pipeline
+```
+
+### 5. Ejecutar dashboard
+
+```bash
+uv run streamlit run app/main.py
+```
+
+---
+
+## Componentes principales
+
+- `etl/extract_denue.py`: extracción de datos desde DENUE
+- `etl/check_updates.py`: cálculo y comparación de hash
+- `etl/transform_data.py`: limpieza, georreferenciación y join espacial
+- `etl/build_snapshot.py`: persistencia de `latest` y snapshots
+- `etl/run_pipeline.py`: orquestación del pipeline
+- `app/main.py`: dashboard principal en Streamlit
+- `app/data.py`: carga y validación del dataset procesado para la app

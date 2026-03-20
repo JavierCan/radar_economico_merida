@@ -9,6 +9,7 @@ venv/
 
 # uv
 .python-version
+!.python-version
 
 # Data outputs
 data/raw/*
