@@ -9,6 +9,7 @@ from etl.check_updates import has_raw_changed, save_current_hash
 from etl.common import ensure_dir, get_logger, load_settings, now_tag, utc_now_iso
 from etl.extract_denue import extract_denue
 from etl.extract_merida import load_or_download_merida_layer
+from etl.schema import validate_processed_dataset
 from etl.transform_data import transform_data
 
 logger = get_logger("etl.run_pipeline")
@@ -127,6 +128,8 @@ def main():
             finalize_run(row)
             logger.warning("La transformación devolvió un dataset vacío.")
             return
+
+        validate_processed_dataset(gdf_processed)
 
         snapshot_result = build_snapshot(
             gdf_processed,

@@ -1,6 +1,7 @@
 # Radar Económico de Mérida
 
-Dashboard geoespacial end-to-end desarrollado con Python y Streamlit para analizar la actividad económica de Mérida, Yucatán.
+Dashboard geoespacial end-to-end desarrollado con Python y Streamlit
+para analizar la actividad económica de Mérida, Yucatán.
 
 ## Estado actual
 

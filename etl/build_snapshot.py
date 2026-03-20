@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from etl.common import ensure_dir, get_logger, load_settings, now_tag
+from etl.schema import validate_processed_dataset
 
 logger = get_logger("etl.build_snapshot")
 
@@ -51,8 +52,7 @@ def build_snapshot(
     save_latest_file: bool = True,
     save_snapshot_file: bool = True,
 ) -> dict[str, Path | None]:
-    if df.empty:
-        raise ValueError("No se puede generar latest/snapshot a partir de un DataFrame vacío.")
+    validate_processed_dataset(df)
 
     latest_path: Path | None = None
     snapshot_path: Path | None = None

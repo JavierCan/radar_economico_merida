@@ -8,19 +8,20 @@ import pandas as pd
 import streamlit as st
 
 from etl.common import latest_file
+from etl.schema import validate_processed_dataset
 
 
 @st.cache_data
-
 def load_latest_dataset(path: Path) -> pd.DataFrame:
     try:
-        return gpd.read_parquet(path)
+        df = gpd.read_parquet(path)
     except (ValueError, OSError, TypeError):
-        return pd.read_parquet(path)
+        df = pd.read_parquet(path)
+
+    return validate_processed_dataset(df)
 
 
 @st.cache_data
-
 def load_geojson(path: Path):
     if not path.exists():
         return None

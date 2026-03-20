@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
@@ -33,7 +31,10 @@ def test_save_snapshot_creates_versioned_file(tmp_path, monkeypatch):
         },
     )
 
-    out_path = build_snapshot.save_snapshot(pd.DataFrame({"a": [1]}), prefix="radar_test")
+    out_path = build_snapshot.save_snapshot(
+        pd.DataFrame({"a": [1]}),
+        prefix="radar_test",
+    )
     assert out_path.exists()
     assert out_path.parent == snapshots_dir
     assert out_path.name.startswith("radar_test_")
