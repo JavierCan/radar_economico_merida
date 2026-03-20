@@ -814,18 +814,15 @@ dependencies = [
     { name = "plotly" },
     { name = "pyarrow" },
     { name = "pydeck" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "requests" },
-    { name = "ruff" },
     { name = "seaborn" },
     { name = "shapely" },
     { name = "streamlit" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -841,20 +838,20 @@ requires-dist = [
     { name = "plotly", specifier = ">=5.0" },
     { name = "pyarrow", specifier = ">=19.0" },
     { name = "pydeck", specifier = ">=0.9" },
-    { name = "pytest", specifier = ">=7.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
-    { name = "pytest-cov", specifier = ">=5.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=5.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "requests", specifier = ">=2.32" },
-    { name = "ruff", specifier = ">=0.11" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11" },
     { name = "seaborn", specifier = ">=0.12" },
     { name = "shapely", specifier = ">=2.0" },
     { name = "streamlit", specifier = ">=1.43" },
 ]
-provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=8.3" },
+    { name = "pytest-cov", specifier = ">=5.0" },
+    { name = "ruff", specifier = ">=0.11" },
+]
 
 [[package]]
 name = "referencing"
