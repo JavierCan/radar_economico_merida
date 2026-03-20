@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-import requests
 import geopandas as gpd
+import requests
 
-from etl.common import load_settings, ensure_dir
+from etl.common import ensure_dir, get_logger, load_settings
+
+logger = get_logger("etl.extract_merida")
 
 
 def _download_geojson(url: str, output_path: Path) -> Path:
@@ -31,13 +33,13 @@ def load_or_download_merida_layer() -> gpd.GeoDataFrame:
                 f"No existe la capa geográfica local y no se configuró remote_geojson_url: {local_path}"
             )
         _download_geojson(remote_url, local_path)
-        print(f"Capa geográfica descargada en: {local_path}")
+        logger.info("Capa geográfica descargada en %s", local_path)
 
     gdf = gpd.read_file(local_path)
 
     if gdf.empty:
-        print("La capa geográfica de Mérida está vacía.")
+        logger.warning("La capa geográfica de Mérida está vacía.")
     else:
-        print(f"Capa geográfica cargada: {len(gdf)} registros")
+        logger.info("Capa geográfica cargada: %s registros", len(gdf))
 
     return gdf
