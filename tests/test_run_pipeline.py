@@ -21,15 +21,31 @@ def test_run_pipeline_respects_snapshot_flag(monkeypatch):
     calls: dict[str, object] = {}
     settings = {
         "project": {"stage": "phase_2"},
-        "etl": {"enabled": True, "compare_hash": False, "save_snapshots": False},
+        "etl": {
+            "enabled": True,
+            "compare_hash": False,
+            "save_snapshots": False,
+        },
         "paths": {"metadata": "data/metadata"},
         "files": {"manifest": "data/metadata/manifest.csv"},
     }
 
     monkeypatch.setattr(run_pipeline, "load_settings", lambda: settings)
-    monkeypatch.setattr(run_pipeline, "extract_denue", lambda save_raw=True: pd.DataFrame({"x": [1]}))
-    monkeypatch.setattr(run_pipeline, "load_or_download_merida_layer", lambda: pd.DataFrame({"geometry": [1]}))
-    monkeypatch.setattr(run_pipeline, "transform_data", lambda df_denue, gdf_merida=None: VALID_PROCESSED_DF)
+    monkeypatch.setattr(
+        run_pipeline,
+        "extract_denue",
+        lambda save_raw=True: pd.DataFrame({"x": [1]}),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
+        "load_or_download_merida_layer",
+        lambda: pd.DataFrame({"geometry": [1]}),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
+        "transform_data",
+        lambda df_denue, gdf_merida=None: VALID_PROCESSED_DF,
+    )
 
     def fake_build_snapshot(df, save_latest_file=True, save_snapshot_file=True):
         calls["snapshot_args"] = {
@@ -54,16 +70,38 @@ def test_run_pipeline_handles_empty_processed_before_schema_validation(monkeypat
     calls: dict[str, object] = {}
     settings = {
         "project": {"stage": "phase_2"},
-        "etl": {"enabled": True, "compare_hash": False, "save_snapshots": True},
+        "etl": {
+            "enabled": True,
+            "compare_hash": False,
+            "save_snapshots": True,
+        },
         "paths": {"metadata": "data/metadata"},
         "files": {"manifest": "data/metadata/manifest.csv"},
     }
 
     monkeypatch.setattr(run_pipeline, "load_settings", lambda: settings)
-    monkeypatch.setattr(run_pipeline, "extract_denue", lambda save_raw=True: pd.DataFrame({"x": [1]}))
-    monkeypatch.setattr(run_pipeline, "load_or_download_merida_layer", lambda: pd.DataFrame({"geometry": [1]}))
-    monkeypatch.setattr(run_pipeline, "transform_data", lambda df_denue, gdf_merida=None: pd.DataFrame())
-    monkeypatch.setattr(run_pipeline, "build_snapshot", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("snapshot should not run")))
+    monkeypatch.setattr(
+        run_pipeline,
+        "extract_denue",
+        lambda save_raw=True: pd.DataFrame({"x": [1]}),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
+        "load_or_download_merida_layer",
+        lambda: pd.DataFrame({"geometry": [1]}),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
+        "transform_data",
+        lambda df_denue, gdf_merida=None: pd.DataFrame(),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
+        "build_snapshot",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("snapshot should not run")
+        ),
+    )
 
     def fake_finalize_run(row):
         calls["row"] = row
