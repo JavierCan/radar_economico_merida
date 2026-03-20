@@ -3,7 +3,7 @@ project:
   city: Merida
   state: Yucatan
   country: Mexico
-  stage: phase_1
+  stage: phase_2
 
 paths:
   raw: data/raw
@@ -51,6 +51,6 @@ merida:
 
 etl:
   mode: manual_on_demand
-  compare_hash: false
-  save_snapshots: false
+  compare_hash: true
+  save_snapshots: true
   enabled: true

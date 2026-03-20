@@ -3,7 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 
-from etl.common import load_settings, ensure_dir, now_tag
+from etl.common import ensure_dir, get_logger, load_settings, now_tag
+
+logger = get_logger("etl.build_snapshot")
 
 
 def save_latest(
@@ -20,7 +22,7 @@ def save_latest(
 
     df.to_parquet(out_path, index=False)
 
-    print(f"Latest guardado en: {out_path}")
+    logger.info("Latest guardado en %s", out_path)
     return out_path
 
 
@@ -40,7 +42,7 @@ def save_snapshot(
 
     df.to_parquet(out_path, index=False)
 
-    print(f"Snapshot guardado en: {out_path}")
+    logger.info("Snapshot guardado en %s", out_path)
     return out_path
 
 
