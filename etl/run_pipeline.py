@@ -114,7 +114,6 @@ def main():
         merida_records = len(gdf_merida)
 
         gdf_processed = transform_data(df_denue, gdf_merida=gdf_merida)
-        processed_records = len(gdf_processed)
 
         if gdf_processed.empty:
             row = build_run_row(
@@ -130,6 +129,7 @@ def main():
             return
 
         validate_processed_dataset(gdf_processed)
+        processed_records = len(gdf_processed)
 
         snapshot_result = build_snapshot(
             gdf_processed,

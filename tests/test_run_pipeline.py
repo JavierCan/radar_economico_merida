@@ -67,7 +67,7 @@ def test_run_pipeline_respects_snapshot_flag(monkeypatch):
 
 
 def test_run_pipeline_handles_empty_processed_before_schema_validation(monkeypatch):
-    calls: dict[str, object] = {}
+    calls: dict[str, object] = {"validated": False}
     settings = {
         "project": {"stage": "phase_2"},
         "etl": {
@@ -97,6 +97,11 @@ def test_run_pipeline_handles_empty_processed_before_schema_validation(monkeypat
     )
     monkeypatch.setattr(
         run_pipeline,
+        "validate_processed_dataset",
+        lambda df: calls.__setitem__("validated", True),
+    )
+    monkeypatch.setattr(
+        run_pipeline,
         "build_snapshot",
         lambda *args, **kwargs: (_ for _ in ()).throw(
             AssertionError("snapshot should not run")
@@ -111,4 +116,5 @@ def test_run_pipeline_handles_empty_processed_before_schema_validation(monkeypat
 
     run_pipeline.main()
 
+    assert calls["validated"] is False
     assert calls["row"]["status"] == "empty_processed"
