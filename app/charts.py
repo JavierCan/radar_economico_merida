@@ -4,7 +4,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from filters import normalize_text_series
+from app.filters import normalize_text_series
 
 
 def count_table(df: pd.DataFrame, column: str, limit: int | None = None) -> pd.DataFrame:

@@ -81,7 +81,7 @@ Parámetros importantes:
 - `etl/transform_data.py`: limpieza, georreferenciación y join espacial
 - `etl/build_snapshot.py`: persistencia de `latest` y snapshots
 - `etl/run_pipeline.py`: orquestación del pipeline
-- `app/app.py`: dashboard principal en Streamlit
+- `app/main.py`: dashboard principal en Streamlit
 
 ---
 
@@ -96,5 +96,5 @@ python -m etl.run_pipeline
 ### App
 
 ```bash
-streamlit run app/app.py
+streamlit run app/main.py
 ```
